@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import BackgroundMusic from "@/components/BackgroundMusic";
 
 type Props = {
   name: string;
+  youtubeId: string | null;
 };
 
 function isTouchDevice() {
@@ -11,7 +13,9 @@ function isTouchDevice() {
   return window.matchMedia("(hover: none), (pointer: coarse)").matches;
 }
 
-export default function Proposal({ name }: Props) {
+export default function Proposal({ name, youtubeId }: Props) {
+  const [opened, setOpened] = useState(!youtubeId);
+  const [musicOn, setMusicOn] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [noPos, setNoPos] = useState({ left: "50%", top: "62%" });
   const [fleeing, setFleeing] = useState(false);
@@ -19,7 +23,6 @@ export default function Proposal({ name }: Props) {
   const tracked = useRef(false);
 
   useEffect(() => {
-    // Place No button under the Yes button on first paint.
     const place = () => {
       const btn = noRef.current;
       if (!btn) return;
@@ -32,10 +35,10 @@ export default function Proposal({ name }: Props) {
     place();
     window.addEventListener("resize", place);
     return () => window.removeEventListener("resize", place);
-  }, []);
+  }, [opened, accepted]);
 
   useEffect(() => {
-    if (tracked.current) return;
+    if (!opened || tracked.current) return;
     tracked.current = true;
 
     void (async () => {
@@ -65,7 +68,12 @@ export default function Proposal({ name }: Props) {
         keepalive: true,
       });
     })();
-  }, [name]);
+  }, [name, opened]);
+
+  const openWithMusic = () => {
+    setOpened(true);
+    setMusicOn(true);
+  };
 
   const moveNoAway = (clientX?: number, clientY?: number) => {
     const btn = noRef.current;
@@ -107,7 +115,6 @@ export default function Proposal({ name }: Props) {
   };
 
   const onNoPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
-    // Mobile / touch: teleport instantly on press
     if (e.pointerType === "touch" || isTouchDevice()) {
       e.preventDefault();
       e.stopPropagation();
@@ -118,18 +125,30 @@ export default function Proposal({ name }: Props) {
   const onNoClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isTouchDevice()) {
-      moveNoAway(e.clientX, e.clientY);
-      return;
-    }
-    // Desktop click also flees (extra safety)
     moveNoAway(e.clientX, e.clientY);
   };
 
-  if (accepted) {
+  if (youtubeId && !opened) {
     return (
       <div className="stage">
         <Petals />
+        <button type="button" className="open-gate" onClick={openWithMusic}>
+          <span className="open-gate-heart" aria-hidden>
+            ♥
+          </span>
+          <span className="brand-name">{name}</span>
+          <span className="open-gate-hint">Toxun — sürpriz açılsın</span>
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="stage">
+      {youtubeId ? <BackgroundMusic videoId={youtubeId} playing={musicOn} /> : null}
+      <Petals />
+
+      {accepted ? (
         <div className="success">
           <div className="success-heart" aria-hidden>
             ♥
@@ -137,46 +156,52 @@ export default function Proposal({ name }: Props) {
           <h2>Yesss!</h2>
           <p>{name}, artıq rəsmən sevgililərik.</p>
         </div>
-      </div>
-    );
-  }
+      ) : (
+        <div className="hero">
+          <h1 className="brand-name">{name}</h1>
+          <h2 className="question">Mənimlə sevgili olarsan?</h2>
+          <p className="subtitle">Bir cavab seç… amma diqqətli ol.</p>
 
-  return (
-    <div className="stage">
-      <Petals />
-      <div className="hero">
-        <h1 className="brand-name">{name}</h1>
-        <h2 className="question">Mənimlə sevgili olarsan?</h2>
-        <p className="subtitle">Bir cavab seç… amma diqqətli ol.</p>
+          <div className="actions">
+            <button type="button" className="btn btn-yes" onClick={() => setAccepted(true)}>
+              Hə
+            </button>
+          </div>
 
-        <div className="actions">
-          <button type="button" className="btn btn-yes" onClick={() => setAccepted(true)}>
-            Hə
+          <button
+            ref={noRef}
+            type="button"
+            className={`btn btn-no${fleeing ? " fleeing" : ""}`}
+            style={{
+              position: "fixed",
+              left: noPos.left,
+              top: noPos.top,
+            }}
+            onMouseEnter={onNoMouseEnter}
+            onMouseMove={onNoMouseMove}
+            onPointerDown={onNoPointerDown}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              const t = e.touches[0];
+              if (t) moveNoAway(t.clientX, t.clientY);
+            }}
+            onClick={onNoClick}
+          >
+            Yox
           </button>
         </div>
+      )}
 
+      {youtubeId ? (
         <button
-          ref={noRef}
           type="button"
-          className={`btn btn-no${fleeing ? " fleeing" : ""}`}
-          style={{
-            position: "fixed",
-            left: noPos.left,
-            top: noPos.top,
-          }}
-          onMouseEnter={onNoMouseEnter}
-          onMouseMove={onNoMouseMove}
-          onPointerDown={onNoPointerDown}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            const t = e.touches[0];
-            if (t) moveNoAway(t.clientX, t.clientY);
-          }}
-          onClick={onNoClick}
+          className={`music-toggle${musicOn ? " on" : ""}`}
+          onClick={() => setMusicOn((v) => !v)}
+          aria-label={musicOn ? "Musiqini dayandır" : "Musiqini oxut"}
         >
-          Yox
+          {musicOn ? "♪" : "✕"}
         </button>
-      </div>
+      ) : null}
     </div>
   );
 }

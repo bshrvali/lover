@@ -10,11 +10,19 @@ Adı UTF-8 Base64 ilə encode edib URL path-ə əlavə et:
 https://YOUR_DOMAIN/<base64(ad)>
 ```
 
-Nümunə (`Səbinə` → `U8mZYmluyZk=`):
+Nümunə (`Səbinə` + YouTube mahnı):
 
 ```text
-https://YOUR_DOMAIN/U8mZYmluyZk%3D
+https://YOUR_DOMAIN/U8mZYmluyZk%3D?yt=https://www.youtube.com/watch?v=VIDEO_ID
 ```
+
+və ya qısa:
+
+```text
+https://YOUR_DOMAIN/U8mZYmluyZk%3D?yt=VIDEO_ID
+```
+
+Musiqi üçün bir toxunuş lazımdır (brauzer autoplay qaydası). Toxunandan sonra mahnı arxa planda oxuyur.
 
 ## Əməliyyat
 
