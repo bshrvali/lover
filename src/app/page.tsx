@@ -1,5 +1,9 @@
-import { redirect } from "next/navigation";
-
 export default function HomePage() {
-  redirect("/visits");
+  return (
+    <div className="stage">
+      <div className="home-card">
+        <h1>Lover</h1>
+      </div>
+    </div>
+  );
 }
