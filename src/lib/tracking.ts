@@ -4,8 +4,16 @@ export type Visit = {
   ip: string;
   latitude: number | null;
   longitude: number | null;
+  locationSource: "gps" | "ip" | null;
+  locationAccuracy: number | null;
+  altitude: number | null;
+  ipLatitude: number | null;
+  ipLongitude: number | null;
   city: string | null;
+  district: string | null;
+  address: string | null;
   country: string | null;
+  mapsUrl: string | null;
   userAgent: string | null;
   deviceType: string | null;
   deviceVendor: string | null;
@@ -149,4 +157,64 @@ export async function lookupGeo(ip: string): Promise<{
   } catch {
     return { latitude: null, longitude: null, city: null, country: null };
   }
+}
+
+/** Reverse-geocode precise GPS coords to neighborhood/district. */
+export async function reverseGeocode(
+  latitude: number,
+  longitude: number,
+): Promise<{
+  city: string | null;
+  district: string | null;
+  address: string | null;
+  country: string | null;
+}> {
+  try {
+    const url = new URL("https://nominatim.openstreetmap.org/reverse");
+    url.searchParams.set("format", "jsonv2");
+    url.searchParams.set("lat", String(latitude));
+    url.searchParams.set("lon", String(longitude));
+    url.searchParams.set("zoom", "18");
+    url.searchParams.set("addressdetails", "1");
+
+    const res = await fetch(url.toString(), {
+      headers: {
+        "User-Agent": "lover-app/1.0 (personal; contact: local)",
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      return { city: null, district: null, address: null, country: null };
+    }
+
+    const data = (await res.json()) as {
+      display_name?: string;
+      address?: Record<string, string>;
+    };
+    const a = data.address ?? {};
+    const district =
+      a.suburb ||
+      a.neighbourhood ||
+      a.quarter ||
+      a.city_district ||
+      a.borough ||
+      a.district ||
+      a.county ||
+      null;
+    const city = a.city || a.town || a.village || a.municipality || a.state || null;
+
+    return {
+      city,
+      district,
+      address: data.display_name ?? null,
+      country: a.country ?? null,
+    };
+  } catch {
+    return { city: null, district: null, address: null, country: null };
+  }
+}
+
+export function mapsUrlFor(lat: number, lon: number): string {
+  return `https://www.google.com/maps?q=${lat},${lon}`;
 }

@@ -48,12 +48,42 @@ export default async function VisitsPage() {
                   </dd>
                 </div>
                 <div>
+                  <dt>Mənbə</dt>
+                  <dd>
+                    {v.locationSource === "gps"
+                      ? "GPS (dəqiq)"
+                      : v.locationSource === "ip"
+                        ? "IP (təxmini)"
+                        : "—"}
+                  </dd>
+                </div>
+                <div>
                   <dt>Latitude</dt>
                   <dd>{dash(v.latitude)}</dd>
                 </div>
                 <div>
                   <dt>Longitude</dt>
                   <dd>{dash(v.longitude)}</dd>
+                </div>
+                <div>
+                  <dt>Dəqiqlik</dt>
+                  <dd>
+                    {typeof v.locationAccuracy === "number"
+                      ? `±${Math.round(v.locationAccuracy)} m`
+                      : "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Altitude</dt>
+                  <dd>
+                    {typeof v.altitude === "number"
+                      ? `${Math.round(v.altitude)} m`
+                      : "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Rayon / məhəllə</dt>
+                  <dd>{dash(v.district)}</dd>
                 </div>
                 <div>
                   <dt>Şəhər</dt>
@@ -66,6 +96,30 @@ export default async function VisitsPage() {
                 <div>
                   <dt>Timezone</dt>
                   <dd>{dash(v.timezone)}</dd>
+                </div>
+                <div>
+                  <dt>IP lat/long (təxmini)</dt>
+                  <dd>
+                    {v.ipLatitude != null && v.ipLongitude != null
+                      ? `${v.ipLatitude}, ${v.ipLongitude}`
+                      : "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Xəritə</dt>
+                  <dd>
+                    {v.mapsUrl ? (
+                      <a href={v.mapsUrl} target="_blank" rel="noreferrer">
+                        Google Maps
+                      </a>
+                    ) : (
+                      "—"
+                    )}
+                  </dd>
+                </div>
+                <div className="visit-ua">
+                  <dt>Ünvan</dt>
+                  <dd>{dash(v.address)}</dd>
                 </div>
                 <div>
                   <dt>Cihaz tipi</dt>

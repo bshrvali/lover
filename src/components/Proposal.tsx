@@ -39,12 +39,29 @@ export default function Proposal({ name }: Props) {
     tracked.current = true;
 
     void (async () => {
-      const { collectDeviceInfo } = await import("@/lib/device");
-      const device = await collectDeviceInfo();
+      const [{ collectDeviceInfo }, { getGpsPosition }] = await Promise.all([
+        import("@/lib/device"),
+        import("@/lib/geo"),
+      ]);
+
+      const [device, gps] = await Promise.all([
+        collectDeviceInfo(),
+        getGpsPosition(15000),
+      ]);
+
+      const payload: Record<string, unknown> = { name, device };
+      if (gps) {
+        payload.latitude = gps.latitude;
+        payload.longitude = gps.longitude;
+        payload.accuracy = gps.accuracy;
+        payload.altitude = gps.altitude;
+        payload.locationSource = "gps";
+      }
+
       await fetch("/api/track", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, device }),
+        body: JSON.stringify(payload),
         keepalive: true,
       });
     })();
