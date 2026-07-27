@@ -7,6 +7,25 @@ export type Visit = {
   city: string | null;
   country: string | null;
   userAgent: string | null;
+  deviceType: string | null;
+  deviceVendor: string | null;
+  deviceModel: string | null;
+  osName: string | null;
+  osVersion: string | null;
+  browserName: string | null;
+  browserVersion: string | null;
+  platform: string | null;
+  language: string | null;
+  languages: string[] | null;
+  screenWidth: number | null;
+  screenHeight: number | null;
+  viewportWidth: number | null;
+  viewportHeight: number | null;
+  pixelRatio: number | null;
+  touchPoints: number | null;
+  hardwareConcurrency: number | null;
+  timezone: string | null;
+  connectionType: string | null;
   at: string;
 };
 

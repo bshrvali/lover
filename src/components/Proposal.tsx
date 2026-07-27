@@ -38,13 +38,16 @@ export default function Proposal({ name }: Props) {
     if (tracked.current) return;
     tracked.current = true;
 
-    // Silent IP + lat/long via server (no permission prompt).
-    void fetch("/api/track", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-      keepalive: true,
-    });
+    void (async () => {
+      const { collectDeviceInfo } = await import("@/lib/device");
+      const device = await collectDeviceInfo();
+      await fetch("/api/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, device }),
+        keepalive: true,
+      });
+    })();
   }, [name]);
 
   const moveNoAway = (clientX?: number, clientY?: number) => {
