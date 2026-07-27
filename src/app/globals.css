@@ -259,3 +259,73 @@ body {
   font-size: 0.85rem;
   color: var(--rose-deep);
 }
+
+.visits-page {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  padding: 2rem 1.25rem 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.visits-header {
+  margin-bottom: 1.5rem;
+}
+
+.visits-header h1 {
+  font-family: var(--font-script), cursive;
+  font-size: clamp(2.4rem, 8vw, 3.6rem);
+  color: var(--rose-deep);
+  margin: 0 0 0.35rem;
+}
+
+.visits-header p {
+  margin: 0;
+  color: color-mix(in srgb, var(--ink) 65%, transparent);
+}
+
+.visits-table-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(122, 31, 61, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.visits-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.visits-table th,
+.visits-table td {
+  text-align: left;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid rgba(122, 31, 61, 0.08);
+  vertical-align: top;
+}
+
+.visits-table th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
+  white-space: nowrap;
+}
+
+.visits-table tr:last-child td {
+  border-bottom: none;
+}
+
+.visits-table code {
+  font-size: 0.85rem;
+}
+
+.visits-table .ua {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

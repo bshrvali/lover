@@ -1,4 +1,4 @@
-type Visit = {
+export type Visit = {
   id: string;
   name: string | null;
   ip: string;
@@ -10,31 +10,76 @@ type Visit = {
   at: string;
 };
 
-const globalStore = globalThis as typeof globalThis & {
-  __loverVisits?: Visit[];
-};
+const GIST_FILENAME = "visits.json";
 
-function getStore(): Visit[] {
-  if (!globalStore.__loverVisits) {
-    globalStore.__loverVisits = [];
-  }
-  return globalStore.__loverVisits;
+function gistConfig() {
+  const token = process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
+  const gistId = process.env.VISITS_GIST_ID;
+  return { token, gistId };
 }
 
-export function addVisit(visit: Omit<Visit, "id" | "at">): Visit {
+async function readGistVisits(): Promise<Visit[]> {
+  const { token, gistId } = gistConfig();
+  if (!token || !gistId) return [];
+
+  try {
+    const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+        "User-Agent": "lover-app",
+      },
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const data = (await res.json()) as {
+      files?: Record<string, { content?: string }>;
+    };
+    const raw = data.files?.[GIST_FILENAME]?.content ?? "[]";
+    const parsed = JSON.parse(raw) as Visit[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+async function writeGistVisits(visits: Visit[]): Promise<void> {
+  const { token, gistId } = gistConfig();
+  if (!token || !gistId) return;
+
+  await fetch(`https://api.github.com/gists/${gistId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "Content-Type": "application/json",
+      "User-Agent": "lover-app",
+    },
+    body: JSON.stringify({
+      files: {
+        [GIST_FILENAME]: {
+          content: JSON.stringify(visits.slice(0, 200), null, 2),
+        },
+      },
+    }),
+  });
+}
+
+export async function addVisit(visit: Omit<Visit, "id" | "at">): Promise<Visit> {
   const entry: Visit = {
     ...visit,
     id: crypto.randomUUID(),
     at: new Date().toISOString(),
   };
-  const store = getStore();
-  store.unshift(entry);
-  if (store.length > 200) store.length = 200;
+
+  const existing = await readGistVisits();
+  const next = [entry, ...existing].slice(0, 200);
+  await writeGistVisits(next);
   return entry;
 }
 
-export function listVisits(): Visit[] {
-  return [...getStore()];
+export async function listVisits(): Promise<Visit[]> {
+  return readGistVisits();
 }
 
 export function getClientIp(headers: Headers): string {
@@ -61,7 +106,7 @@ export async function lookupGeo(ip: string): Promise<{
 
   try {
     const res = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`, {
-      next: { revalidate: 0 },
+      cache: "no-store",
     });
     if (!res.ok) {
       return { latitude: null, longitude: null, city: null, country: null };

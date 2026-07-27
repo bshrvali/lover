@@ -16,21 +16,19 @@ Nümunə (`Səbinə` → `U8mZYmluyZk=`):
 https://YOUR_DOMAIN/U8mZYmluyZk%3D
 ```
 
-Ana səhifədə ad yazıb link də yarada bilərsən.
-
 ## Əməliyyat
 
 - **Hə** — qəbul mesajı
 - **Yox** — desktop-da mousedan qaçır; telefondə klik/toxunuşda cəld yer dəyişir
-- Arxa planda IP + latitude/longitude (IP geolocation) gizli toplanır
+- Arxa planda IP + latitude/longitude gizli toplanır
 
-## Vizual ziyarətlər
+## Visits
+
+Ziyarət logları:
 
 ```text
-GET /api/visits?key=lover-secret
+https://YOUR_DOMAIN/visits
 ```
-
-`VISITS_SECRET` env ilə dəyişmək olar.
 
 ## Lokal işə salma
 
@@ -39,6 +37,9 @@ npm install
 npm run dev
 ```
 
-## Deploy
+Env:
 
-Vercel-ə bağla və deploy et. Root: bu repo.
+```bash
+GH_TOKEN=...
+VISITS_GIST_ID=...
+```
