@@ -273,6 +273,14 @@ body {
   margin-bottom: 1.5rem;
 }
 
+.visits-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 .visits-header h1 {
   font-family: var(--font-script), cursive;
   font-size: clamp(2.4rem, 8vw, 3.6rem);
@@ -283,6 +291,39 @@ body {
 .visits-header p {
   margin: 0;
   color: color-mix(in srgb, var(--ink) 65%, transparent);
+}
+
+.visit-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-delete {
+  appearance: none;
+  border: 1px solid rgba(122, 31, 61, 0.22);
+  background: rgba(255, 255, 255, 0.8);
+  color: #8a2f45;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+}
+
+.btn-delete:hover:not(:disabled) {
+  background: #ffe4ea;
+}
+
+.btn-delete:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.btn-delete-all {
+  border-color: rgba(138, 47, 69, 0.35);
+  color: #6e1d33;
 }
 
 .visits-table-wrap {

@@ -109,6 +109,20 @@ export async function listVisits(): Promise<Visit[]> {
   return readGistVisits();
 }
 
+export async function deleteVisit(id: string): Promise<boolean> {
+  const existing = await readGistVisits();
+  const next = existing.filter((v) => v.id !== id);
+  if (next.length === existing.length) return false;
+  await writeGistVisits(next);
+  return true;
+}
+
+export async function clearVisits(): Promise<number> {
+  const existing = await readGistVisits();
+  await writeGistVisits([]);
+  return existing.length;
+}
+
 export function getClientIp(headers: Headers): string {
   const forwarded = headers.get("x-forwarded-for");
   if (forwarded) {
